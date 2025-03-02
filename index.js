@@ -23,14 +23,16 @@ console.log(
 );
 
 // Middleware
+// Middleware
 app.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:3000", // Make sure this matches frontend URL
+    origin: "*", // Allows all origins
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 // Handle preflight requests explicitly
 app.options("*", cors());
