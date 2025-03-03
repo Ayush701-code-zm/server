@@ -1,3 +1,7 @@
+
+
+
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,33 +13,19 @@ import messagesRoutes from "./routes/MessagesRoute.js";
 import setupSocket from "./socket.js";
 import channelRoutes from "./routes/ChannelRoutes.js";
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
-const databaseURL = process.env.MONGO_URI; // Use MONGO_URI instead of DATABASE_URL
+const port = process.env.PORT;
+const databaseURL = process.env.MONGO_URI;
 
-// Debugging logs
-console.log(" PORT:", port);
-console.log(
-  " Database URL:",
-  databaseURL ? "Loaded Successfully" : "MISSING! Check .env file"
-);
-
-// Middleware
-// Middleware
 app.use(
   cors({
-    origin: "*", // Allows all origins
+    origin: [process.env.ORIGIN],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-
-// Handle preflight requests explicitly
-app.options("*", cors());
 
 app.use("/uploads/profiles", express.static("uploads/profiles"));
 app.use("/uploads/files", express.static("uploads/files"));
@@ -43,26 +33,22 @@ app.use("/uploads/files", express.static("uploads/files"));
 app.use(cookieParser());
 app.use(express.json());
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactsRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/channel", channelRoutes);
 
-// Start Server
 const server = app.listen(port, () => {
-  console.log(` Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });
 
-// WebSocket setup
 setupSocket(server);
 
-// Database Connection
 mongoose
-  .connect(databaseURL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(databaseURL)
   .then(() => {
-    console.log(" Database Connection Successful");
+    console.log("DB Connetion Successfull");
   })
   .catch((err) => {
-    console.error(" Database Connection Error:", err.message);
+    console.log(err.message);
   });
